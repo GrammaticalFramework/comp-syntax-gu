@@ -1,8 +1,8 @@
 where is the bar
-do groceries sell beer
-I like this restaurant
-do you like this trendy bar
-let's grab a beer
+do all groceries sell beer
+I like the restaurant
+do you like the trendy bar
+let's grab beer
 the bar is open
-the bar is not closed
+the bar isn't closed
 
