@@ -1,0 +1,13 @@
+S  ::= NP_Sg_1 "am" "a" N_Sg
+S  ::= NP_Sg_2 "are" "a" N_Sg
+S  ::= NP_Sg_3 "is" "a" N_Sg
+S  ::= NP_Pl "are" N_Pl
+NP_Sg_1 ::= "I"
+NP_Sg_2 ::= "you"
+NP_Sg_3 ::= "he"
+NP_Sg_3 ::= "she"
+NP_Pl ::= "we"
+NP_Pl ::= "you"
+NP_Pl ::= "they"
+N_Sg  ::= "linguist"
+N_Pl  ::= "linguists"
