@@ -53,7 +53,7 @@ lin
    adverbCategory = mkCN (mkN "adverb") ;
    sentenceCategory = mkCN (mkN "sentence") ;
    nounPhraseCategory = mkCN (mkN "noun phrase") ;
-   verbPhraseCategory = mkCN (mkN "verb") ;
+   verbPhraseCategory = mkCN (mkN "verb phrase") ;
    transitiveVerbCategory = mkCN (mkA "transitive") (mkN "verb") ;
 
    numberParameterType = mkCN (mkN "number") ;
@@ -74,9 +74,9 @@ lin
    feminineParameterValue  = mkParameterValue "feminine" ;
    neuterParameterValue    = mkParameterValue "neuter" ;
 
-   firstParameterValue  = mkParameterValue "first person" ;
-   secondParameterValue = mkParameterValue "second person" ;
-   thirdParameterValue  = mkParameterValue "third person" ;
+   firstParameterValue  = mkParameterValue (mkCN (mkA "first") (mkN "person")) ;
+   secondParameterValue = mkParameterValue (mkCN (mkA "second") (mkN "person")) ;
+   thirdParameterValue  = mkParameterValue (mkCN (mkA "third") (mkN "person")) ;
    
    presentParameterValue = mkParameterValue "present" ;
    pastParameterValue = mkParameterValue "past" ;
@@ -92,6 +92,9 @@ lin
    ConsParameterType pt pts = {bare = mkNP and_Conj (mkNP pt) pts.bare ; indef = mkNP and_Conj (mkNP a_Det pt) pts.indef} ;
 
 oper
-   mkParameterValue : Str -> ParameterValue = \str -> lin ParameterValue (mkNP the_Det (mkN str)) ;
+   mkParameterValue = overload {
+     mkParameterValue : Str -> NP = \str -> (mkNP the_Det (mkN str)) ;
+     mkParameterValue : CN -> NP = \cn -> (mkNP the_Det cn) ;
+     } ;
    
 }

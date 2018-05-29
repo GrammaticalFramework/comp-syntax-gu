@@ -50,6 +50,20 @@ fun
    nounPhraseCategory     : Category ;
    verbPhraseCategory     : Category ;
    transitiveVerbCategory : Category ;
+   pronounCategory : Category ;
+   determinerCategory : Category ;
+   relativePronounCategory : Category ;
+   interrogativePronounCategory : Category ;
+   conjunctionCategory : Category ;
+   subjunctionCategory : Category ;
+   particleCategory : Category ;
+   articleCategory : Category ;
+
+   utteranceCategory : Category ;
+   questionCategory : Category ;
+   relativeClauseCategory : Category ;
+   adjectivalPhraseCategory : Category ;
+   adverbialPhraseCategory : Category ;
 
    numberParameterType : ParameterType ;
    caseParameterType   : ParameterType ;
@@ -75,5 +89,10 @@ fun
    presentParameterValue : ParameterValue ;
    pastParameterValue    : ParameterValue ;
    futureParameterValue  : ParameterValue ;
+
+   indicativeParameterValue  : ParameterValue ;
+   conjunctiveParameterValue  : ParameterValue ;
+   imperativeParameterValue  : ParameterValue ;
+   participleParameterValue  : ParameterValue ;
    
 }
