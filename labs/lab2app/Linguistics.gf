@@ -58,6 +58,8 @@ fun
    subjunctionCategory : Category ;
    particleCategory : Category ;
    articleCategory : Category ;
+   prepositionCategory : Category ;
+   interjectionCategory : Category ;
 
    utteranceCategory : Category ;
    questionCategory : Category ;
@@ -94,5 +96,6 @@ fun
    conjunctiveParameterValue  : ParameterValue ;
    imperativeParameterValue  : ParameterValue ;
    participleParameterValue  : ParameterValue ;
+   infinitiveParameterValue  : ParameterValue ;
    
 }

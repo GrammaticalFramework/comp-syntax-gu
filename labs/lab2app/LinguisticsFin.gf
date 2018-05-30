@@ -23,7 +23,7 @@ lin
    ruleStatement rule = mkUtt rule ;
    languageRuleStatement language rule = mkUtt (mkS (SyntaxFin.mkAdv in_Prep language) rule) ;
 
-   categoryInflectedRule category types = mkS (mkCl (mkNP aPl_Det category) (mkV2 (mkV "taipua") for_Prep) types.bare) ;
+   categoryInflectedRule category types = mkS (mkCl (mkNP aPl_Det category) (mkV2 (mkV "taipua") in_Prep) types.bare) ;
    categoryNotInflectedRule category = mkS negativePol (mkCl (mkNP aPl_Det category) (mkV "taipua")) ;
   
    categoryInherentRule category types = mkS (mkCl (mkNP aPl_Det category) have_V2 types.indef) ;
@@ -35,7 +35,7 @@ lin
    wordInherentRule ptype category word pvalue = mkS (mkCl (mkNP (G.PossNP ptype (mkNP the_Det (mkCN category word)))) pvalue) ;
 
    wordCategoryRule word category = mkS (mkCl word category) ;
-   syntaxCombinationRule category categories = mkS (mkCl (mkNP a_Det category) can_VV (mkVP (passiveVP (mkV2 "muodostaa")) (SyntaxFin.mkAdv from_Prep categories))) ;
+   syntaxCombinationRule category categories = mkS (mkCl (mkNP a_Det category) can_VV (mkVP (mkVP (mkV "koostua")) (SyntaxFin.mkAdv from_Prep categories))) ;
 
    agreementRule cat1 cat2 ptypes = mkS (mkCl (mkNP the_Det cat1) (mkVP (mkVP (mkV2 (mkV "kongruoida") with_Prep) (mkNP the_Det cat2)) (SyntaxFin.mkAdv in_Prep ptypes.bare))) ;
    orderBeforeRule cat1 cat2 = mkS (mkCl (mkNP the_Det cat1) (mkVP (passiveVP (mkV2 "sijoittaa")) (SyntaxFin.mkAdv before_Prep (mkNP the_Det cat2)))) ;
@@ -55,6 +55,22 @@ lin
    nounPhraseCategory = mkCN (mkN "nominaalilauseke") ;
    verbPhraseCategory = mkCN (mkN "verbilauseke") ;
    transitiveVerbCategory = mkCN (mkN "transitiivi" (mkN "verbi")) ;
+   pronounCategory = mkCN (mkN "pronomini") ;
+   determinerCategory = mkCN (mkN "determinaattori") ;
+   relativePronounCategory = mkCN (mkN "relatiivipronomini") ;
+   interrogativePronounCategory = mkCN (mkN "interrogatiivipronomini") ;
+   conjunctionCategory = mkCN (mkN "rinnastuskonjunktio") ;
+   subjunctionCategory = mkCN (mkN "alistuskonjunktio") ;
+   particleCategory = mkCN (mkN "partikkeli") ;
+   articleCategory = mkCN (mkN "artikkeli") ;
+   prepositionCategory = mkCN (mkN "prepositio") ;
+   interjectionCategory = mkCN (mkN "interjektio") ;
+
+   utteranceCategory = mkCN (mkN "virke") ;
+   questionCategory = mkCN (mkN "kysymys") ;
+   relativeClauseCategory = mkCN (mkN "relatiivilause") ;
+   adjectivalPhraseCategory = mkCN (mkN "adjektiivilauseke") ;
+   adverbialPhraseCategory = mkCN (mkN "adverbiaalilauseke") ;
 
    numberParameterType = mkCN (mkN "luku" "luvun" "lukuja") ;
    caseParameterType = mkCN (mkN "sija") ;
@@ -82,6 +98,12 @@ lin
    pastParameterValue = mkParameterValue "imperfekti" ;
    futureParameterValue = mkParameterValue "futuuri" ;
 
+   indicativeParameterValue = mkParameterValue "indikatiivi" ;
+   conjunctiveParameterValue = mkParameterValue "konjunktiivi" ;
+   imperativeParameterValue = mkParameterValue "imperatiivi" ;
+   participleParameterValue = mkParameterValue "partisiippi" ;
+   infinitiveParameterValue = mkParameterValue "infinitiivi" ;
+ 
    BaseCategory c = mkNP a_Det c ;
    ConsCategory c cs = mkNP and_Conj (mkNP a_Det c) cs ;
    

@@ -55,6 +55,22 @@ lin
    nounPhraseCategory = mkCN (mkN "noun phrase") ;
    verbPhraseCategory = mkCN (mkN "verb phrase") ;
    transitiveVerbCategory = mkCN (mkA "transitive") (mkN "verb") ;
+   pronounCategory = mkCN (mkN "pronoun") ;
+   determinerCategory = mkCN (mkN "determiner") ;
+   relativePronounCategory = mkCN (mkA "relative") (mkN "pronoun") ;
+   interrogativePronounCategory = mkCN (mkA "interrogative") (mkN "pronoun") ;
+   conjunctionCategory = mkCN (mkN "conjunction") ;
+   subjunctionCategory = mkCN (mkN "subjunction") ;
+   particleCategory = mkCN (mkN "particle") ;
+   articleCategory = mkCN (mkN "article") ;
+   prepositionCategory = mkCN (mkN "preposition") ;
+   interjectionCategory = mkCN (mkN "interjection") ;
+
+   utteranceCategory = mkCN (mkN "utterance") ;
+   questionCategory = mkCN (mkN "question") ;
+   relativeClauseCategory = mkCN (mkA "relative") (mkN "clause") ;
+   adjectivalPhraseCategory = mkCN (mkA "adjectival") (mkN "phrase") ;
+   adverbialPhraseCategory = mkCN (mkA "adverbial") (mkN "phrase") ;
 
    numberParameterType = mkCN (mkN "number") ;
    caseParameterType = mkCN (mkN "case") ;
@@ -82,6 +98,12 @@ lin
    pastParameterValue = mkParameterValue "past" ;
    futureParameterValue = mkParameterValue "future" ;
 
+   indicativeParameterValue = mkParameterValue "indicative" ;
+   conjunctiveParameterValue = mkParameterValue "conjunctive" ;
+   imperativeParameterValue = mkParameterValue "imperative" ;
+   participleParameterValue = mkParameterValue "participle" ;
+   infinitiveParameterValue = mkParameterValue "infinitive" ;
+   
    BaseCategory c = mkNP a_Det c ;
    ConsCategory c cs = mkNP and_Conj (mkNP a_Det c) cs ;
    
