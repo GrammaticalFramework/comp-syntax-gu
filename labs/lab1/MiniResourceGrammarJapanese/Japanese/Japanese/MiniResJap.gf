@@ -20,9 +20,26 @@ oper
 
   mkPN : Str -> ProperName = \s -> {s = s} ;
 
-  Adjective : Type = {s : Str} ;
+  Adjective : Type = {s : VPol => Str} ;
 
-  mkA : Str -> Adjective = \s -> {s = s} ;
+  mkAdjective : Str -> Str -> Adjective = \positiveForm,negativeForm -> {
+    s = table { VPos => positiveForm ;
+                VNeg => negativeForm }
+    } ;
+
+  smartAdjective : Str -> Adjective = \inf -> case inf of {
+     -- i-adjectives
+     s + "i" => mkAdjective (s + "i") (s + "kunai") ;
+     -- na-adjectives
+     s + "na" => mkAdjective (s + "na") (s + " janai") ;
+     -- other
+     _ => mkAdjective inf inf
+     } ;
+
+  mkA = overload {
+   mkA : Str -> Adjective = smartAdjective ;
+   mkA : Str -> Str -> Adjective = mkAdjective ;
+   } ;
 
   Verb : Type = {s : VPol => Str} ;
 
@@ -32,11 +49,12 @@ oper
     } ;
 
   smartVerb : Str -> Verb = \inf -> case inf of {
-     -- Irregular verbs
+     -- Irregular verbs (+ verbs too short to make with 's + "..."'.)
      "kuru" => mkVerb ("kimasu") ("kimasen") ;
-     "desu" => mkVerb ("desu") ("dewa arimasen") ;
+     "desu" => mkVerb ("desu") ("desu") ;
      "sumu" => mkVerb ("sundeimasu") ("sundeimasen") ;
-     "iru" => mkVerb ("imasu") ("imasen") ;
+     "oru" => mkVerb ("orimasu") ("orimasen") ;
+     "kau" => mkVerb ("kaimasu") ("kaimasen") ;
      -- Regular verbs
      -- Godan (consonant-stem verbs)
      s + "mu" => mkVerb (s + "mimasu") (s + "mimasen") ;
@@ -55,7 +73,6 @@ oper
 
   mkV = overload {
     mkV : Str -> Verb = smartVerb ;
-    -- mkV : Str -> Verb = \inf -> mkVerb inf ; -- Issues here!
     } ;
 
   Verb2 : Type = Verb ;
@@ -65,9 +82,9 @@ oper
     mkV2 : Verb        -> Verb2 = \v   -> v ;
     } ;
 
-  Adverb : Type = {s : Str ; pos : Position} ;
+  Adverb : Type = {s : VPol => Str ; pos : Position} ;
 
-  mkAdv : Str -> Position -> Adverb = \s,p -> {s = s ; pos = p} ;
+  mkAdv : Str -> Position -> Adverb = \s,p -> {s = \\_ => s ; pos = p} ;
 
   emptyAdv : Adverb = mkAdv "" Init ;
 
