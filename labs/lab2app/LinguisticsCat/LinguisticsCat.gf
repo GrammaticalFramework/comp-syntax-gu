@@ -52,8 +52,8 @@ lin
    adjectiveCategory = mkCN (mkN "adjectiu") ;
    adverbCategory = mkCN (mkN "adverbi" "adverbis" masculine) ;
    sentenceCategory = mkCN (mkN "oració" feminine) ;
-   nounPhraseCategory = mkCN (mkN "sintagma nominal") ;
-   verbPhraseCategory = mkCN (mkN "sintagma verbal") ;
+   nounPhraseCategory = mkCN (mkA "nominal") (mkN "sintagma" masculine) ;
+   verbPhraseCategory = mkCN (mkA "verbal") (mkN "sintagma" masculine) ;
    transitiveVerbCategory = mkCN (mkA "transitiu") (mkN "verb") ;
    pronounCategory = mkCN (mkN "pronom") ;
    determinerCategory = mkCN (mkN "determinant") ;
