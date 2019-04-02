@@ -7,7 +7,8 @@ param
 
   Agreement = Agr Number Person ;
 
-  VForm = Inf | PresSg3 ;
+  -- all forms of normal Eng verbs, although not yet used in MiniGrammar
+  VForm = Inf | PresSg3 | Past | PastPart | PresPart ; 
 
 oper
   Noun : Type = {s : Number => Str} ;
@@ -21,76 +22,75 @@ oper
   -- smart paradigm
   smartNoun : Str -> Noun = \sg -> case sg of {
     _ + ("ay"|"ey"|"oy"|"uy") => regNoun sg ;
-    x + "y" => mkNoun sg (x + "ies") ;
-    _ + ("ch"|"sh"|"s"|"o") => mkNoun sg (sg + "es") ;
-    _       => regNoun sg
+    x + "y"                   => mkNoun sg (x + "ies") ;
+    _ + ("ch"|"sh"|"s"|"o")   => mkNoun sg (sg + "es") ;
+    _                         => regNoun sg
     } ;
-
-  mkN = overload {
-   mkN : Str -> Noun = smartNoun ;
-   mkN : Str -> Str -> Noun = mkNoun ;
-   } ;
-
-  ProperName : Type = {s : Str} ;
-
-  mkPN : Str -> ProperName = \s -> {s = s} ;
 
   Adjective : Type = {s : Str} ;
 
-  mkA : Str -> Adjective = \s -> {s = s} ;
-
   Verb : Type = {s : VForm => Str} ;
 
-  mkVerb : (inf,pres : Str) -> Verb = \inf,pres -> {
+  mkVerb : (inf,pres,past,pastpart,prespart : Str) -> Verb
+    = \inf,pres,past,pastpart,prespart -> {
     s = table {
       Inf => inf ;
-      PresSg3 => pres
+      PresSg3 => pres ;
+      Past => past ;
+      PastPart => pastpart ;
+      PresPart => prespart
       }
     } ;
 
-  smartVerb : Str -> Verb = \inf ->
-     mkVerb inf ((mkN inf).s ! Pl) ;
- 
-  mkV = overload {
-    mkV : Str -> Verb = smartVerb ;
-    mkV : (inf,pres : Str) -> Verb = mkVerb ;
-    } ;
+  regVerb : (inf : Str) -> Verb = \inf ->
+    mkVerb inf (inf + "s") (inf + "ed") (inf + "ed") (inf + "ing") ;
 
-  Verb2 : Type = Verb ** {c : Str} ;
-
-  mkV2 = overload {
-    mkV2 : Str         -> Verb2 = \s   -> mkV s ** {c = []} ;
-    mkV2 : Str  -> Str -> Verb2 = \s,p -> mkV s ** {c = p} ;
-    mkV2 : Verb        -> Verb2 = \v   -> v ** {c = []} ;
-    mkV2 : Verb -> Str -> Verb2 = \v,p -> v ** {c = p} ;
-    } ;
-
-  Adverb : Type = {s : Str} ;
-
-  mkAdv : Str -> Adverb = \s -> {s = s} ;
-
-  be_GVerb : GVerb = {
-     s = table {
-       PresSg1 => "am" ;
-       PresPl  => "are" ;
-       VF vf   => (mkVerb "be" "is").s ! vf
-       } ;
-     isAux = True
+  -- regular verbs with predictable variations
+  smartVerb : Str -> Verb = \inf -> case inf of {
+     pl  +  ("a"|"e"|"i"|"o"|"u") + "y" => regVerb inf ;
+     cr  +  "y" =>  mkVerb inf (cr + "ies") (cr + "ied") (cr + "ied") (inf + "ing") ;
+     lov + "e"  => mkVerb inf (inf + "s") (lov + "ed") (lov + "ed") (lov + "ing") ;
+     kis + ("s"|"sh"|"x") => mkVerb inf (inf + "es") (inf + "ed") (inf + "ed") (inf + "ing") ;
+     _ => regVerb inf
      } ;
 
+  -- normal irregular verbs e.g. drink,drank,drunk
+  irregVerb : (inf,past,pastpart : Str) -> Verb =
+    \inf,past,pastpart ->
+      let verb = smartVerb inf
+      in mkVerb inf (verb.s ! PresSg3) past pastpart (verb.s ! PresPart) ;   
+
+  negation : Bool -> Str = \b -> case b of {True => [] ; False => "not"} ; 
+
+  -- two-place verb with "case" as preposition; for transitive verbs, c=[]
+  Verb2 : Type = Verb ** {c : Str} ;
+
+  -- generalized verb, here just "be"
+ param
+   GVForm = VF VForm | PresSg1 | PresPl | PastPl ;
+
+ oper
   GVerb : Type = {
      s : GVForm => Str ;
      isAux : Bool
      } ;
 
- param
-   GVForm = VF VForm | PresSg1 | PresPl ;
+  be_GVerb : GVerb = {
+     s = table {
+       PresSg1 => "am" ;
+       PresPl  => "are" ;
+       PastPl  => "were" ;
+       VF vf   => (mkVerb "be" "is" "was" "been" "being").s ! vf
+       } ;
+     isAux = True
+     } ;
 
- oper
+  -- in VP formation, all verbs are lifted to GVerb, but morphology doesn't need to know this
    verb2gverb : Verb -> GVerb = \v -> {s =
      table {
        PresSg1 => v.s ! Inf ;
        PresPl  => v.s ! Inf ;
+       PastPl  => v.s ! Past ;
        VF vf   => v.s ! vf
        } ;
      isAux = False
