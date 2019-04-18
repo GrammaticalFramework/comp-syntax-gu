@@ -12,14 +12,14 @@ concrete MiniGrammarSwe of MiniGrammar = open MiniResSwe, Prelude in {
     Cl, QCl = {   -- word order is fixed in S and QS
       subj  : Str ;                      -- subject
       verb  : Bool => {fin,inf : Str} ;  -- dep. Temp, e.g. "har","sovit"
-      compl : Str                        -- after verb: complement, adverbs
+      compl : Str           -- after verb: complement, adverbs, adjective
       } ;
-    Imp = {s : Str} ;
-    VP = {verb : Verb ; compl : Str} ;
+    Imp = {s : Bool => Str} ;
+    VP = {verb : Verb ; compl : AForm => Str} ;
     AP = Adjective ;
     CN = Noun ;
-    NP = {s : Case => Str ; a : Agreement} ;
-    Pron = {s : Case => Str ; a : Agreement} ;
+    NP = {s : Case => Str ; a : AForm} ;
+    Pron = {s : Case => Str ; a : AForm} ;
     Det = {s : Gender => Str ; n : Number} ;
     Conj = {s : Str} ;
     Prep = {s : Str} ;
@@ -35,7 +35,7 @@ concrete MiniGrammarSwe of MiniGrammar = open MiniResSwe, Prelude in {
     UttQS s = s ;
     UttNP np = {s = np.s ! Nom} ; 
     UttAdv adv = adv ;
-    UttImpSg pol imp = {s = imp.s ++ negation pol.isTrue} ;
+    UttImpSg pol imp = {s = imp.s ! pol.isTrue} ;
 
     UseCl temp pol cl =
       let clt = cl.verb ! temp.isPres
@@ -60,7 +60,7 @@ concrete MiniGrammarSwe of MiniGrammar = open MiniResSwe, Prelude in {
       } ;
 
     QuestCl cl = cl ; -- since the parts are the same, we don't need to change anything
-
+{-
     PredVP np vp = {
       subj = np.s ! Nom ;
       compl = vp.compl ;
@@ -82,70 +82,69 @@ concrete MiniGrammarSwe of MiniGrammar = open MiniResSwe, Prelude in {
         -- the negation word "not" is put in place in UseCl, UseQCl
       }
     } ;
+-}
 
     ImpVP vp = {
-      s = table {
-        True  => vp.verb.s ! VF Inf ++ vp.compl ;    -- in Swe, imperative = infinitive
-        False => "do not" ++ vp.verb.s ! VF Inf ++ vp.compl
-        }
+      s = \\b => vp.verb.s ! Imper ++ negation b ++ vp.compl ! ASg Utr --- could be Pl
       } ;
 
     UseV v = {
-      verb = verb2gverb v ;  -- lift ordinary verbs to generalized verbs
-      compl = []
+      verb = v ;
+      compl = \\_ => []
       } ;
-      
+
     ComplV2 v2 np = {
-      verb = verb2gverb v2 ;
-      compl = v2.c ++ np.s ! Acc  -- NP object in the accusative, preposition first
+      verb = v2 ;
+      compl = \\_ => v2.c ++ np.s ! Acc  -- NP object in the accusative, preposition first
       } ;
       
     UseAP ap = {
-      verb = be_GVerb ;     -- the verb is the copula "be"
+      verb = copulaVerb ;
       compl = ap.s
       } ;
       
     UseNP np = {
-      verb = be_GVerb ;
-      compl = np.s ! Nom    -- NP complement is in the nominative
+      verb = copulaVerb ;
+      compl = \\_ => np.s ! Nom    -- NP complement is in the nominative
       } ;
       
     UseAdv adv = {
-      verb = be_GVerb ;
-      compl = adv.s
+      verb = copulaVerb ;
+      compl = \\_ => adv.s
       } ;
 
     AdvVP vp adv =
-      vp ** {compl = vp.compl ++ adv.s} ;
-      
+      vp ** {compl = \\a => vp.compl ! a ++ adv.s} ;
+{-      
     DetCN det cn = {
       s = table {c => det.s ++ cn.s ! det.n} ;
       a = Agr det.n Per3   -- this kind of NP is always third person
       } ;
-      
+-}      
     UsePN pn = {
       s = \\_ => pn.s ;
-      a = Agr Sg Per3
+      a = ASg pn.g
       } ;
       
     UsePron p = p ;  -- Pron is worst-case NP  
       
     MassNP cn = {
-      s = \\_ => cn.s ! Sg ;
-      a = Agr Sg Per3
+      s = \\_ => cn.s ! Sg ! Indef ;
+      a = ASg cn.g
       } ;
-      
+
+{-
     a_Det = {s = pre {"a"|"e"|"i"|"o" => "an" ; _ => "a"} ; n = Sg} ; --- a/an can get wrong
     aPl_Det = {s = "" ; n = Pl} ;
     the_Det = {s = "the" ; n = Sg} ;
     thePl_Det = {s = "the" ; n = Pl} ;
-    
+
     UseN n = n ;
     
     AdjCN ap cn = {
       s = table {n => ap.s ++ cn.s ! n}
       } ;
-
+-}
     PositA a = a ;
 
     PrepNP prep np = {s = prep.s ++ np.s ! Acc} ;
@@ -158,44 +157,43 @@ concrete MiniGrammarSwe of MiniGrammar = open MiniResSwe, Prelude in {
     TSim  = {s = []    ; isPres = True} ;
     TAnt  = {s = []    ; isPres = False} ;
 
-    and_Conj = {s = "and"} ;
-    or_Conj = {s = "or"} ;
+    and_Conj = {s = "och"} ;
+    or_Conj = {s = "eller"} ;
 
-    every_Det = {s = "every" ; n = Sg} ;
+    every_Det = {s = \\_ => "varje" ; n = Sg} ;
 
-    in_Prep = {s = "in"} ;
-    on_Prep = {s = "on"} ;
-    with_Prep = {s = "with"} ;
+    in_Prep = {s = "i"} ;
+    on_Prep = {s = "på"} ;
+    with_Prep = {s = "med"} ;
 
     i_Pron = {
-      s = table {Nom => "I" ; Acc => "me"} ;
-      a = Agr Sg Per1
+      s = table {Nom => "jag" ; Acc => "mig"} ;
+      a = ASg Utr
       } ;
     youSg_Pron = {
-      s = \\_ => "you" ;
-      a = Agr Sg Per2
+      s = table {Nom => "du" ; Acc => "dig"} ;
+      a = ASg Utr
       } ;
     he_Pron = {
-      s = table {Nom => "he" ; Acc => "him"} ;
-      a = Agr Sg Per3
+      s = table {Nom => "han" ; Acc => "honom"} ;
+      a = ASg Utr
       } ;
     she_Pron = {
-      s = table {Nom => "she" ; Acc => "her"} ;
-      a = Agr Sg Per3
+      s = table {Nom => "hon" ; Acc => "henne"} ;
+      a = ASg Utr
       } ;
     we_Pron = {
-      s = table {Nom => "we" ; Acc => "us"} ;
-      a = Agr Pl Per1
+      s = table {Nom => "vi" ; Acc => "oss"} ;
+      a = APl
       } ;
     youPl_Pron = {
-      s = \\_ => "you" ;
-      a = Agr Pl Per2
+      s = table {Nom => "ni" ; Acc => "er"} ;
+      a = APl
       } ;
     they_Pron = {
-      s = table {Nom => "they" ; Acc => "them"} ;
-      a = Agr Pl Per2
+      s = table {Nom => "de" ; Acc => "dem"} ;
+      a = APl
       } ;
 
-    have_V2 = mkVerb "have" "has" "had" "had" "having" ** {c = []} ;
-
+    have_V2 = mkVerb "ha" "har" "hade" "haft" "ha" ** {c = []} ;
 }

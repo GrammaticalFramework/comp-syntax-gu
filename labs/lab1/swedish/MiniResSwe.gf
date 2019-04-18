@@ -6,13 +6,11 @@ param
   Species = Indef | Def ;
   Gender = Utr | Neutr ;
 
-  Agreement = Agr Gender Number ;
-
   -- positive forms of Swe adjectives
   AForm = ASg Gender | APl ;
   
   -- non-participle forms of Swe verbs
-  VForm = Inf | Pres | Past | Sup ;
+  VForm = Inf | Pres | Past | Sup | Imper ;
 
 oper
 ----- nouns ---------------------
@@ -86,29 +84,30 @@ oper
 
   Verb : Type = {s : VForm => Str} ;
 
-  mkVerb : (inf,pres,past,sup : Str) -> Verb
-    = \inf,pres,past,sup -> {
+  mkVerb : (inf,pres,past,sup,imp : Str) -> Verb
+    = \inf,pres,past,sup,imp -> {
     s = table {
       Inf => inf ;
       Pres => pres ;
       Past => past ;
-      Sup  => sup
+      Sup  => sup ;
+      Imper => imp
       }
     } ;
 
   conjI : Str -> Verb = \tala ->
-    mkVerb tala (tala + "r") (tala + "de") (tala + "t") ;
+    mkVerb tala (tala + "r") (tala + "de") (tala + "t") tala ;
     
   conjII : Str -> Verb = \leka ->
     let lek = init leka
     in
     case lek of {
-      _ + ("k"|"p"|"t") => mkVerb leka (lek + "er") (lek + "te") (lek + "t") ;
-      _                 => mkVerb leka (lek + "er") (lek + "de") (lek + "t")
+      _ + ("k"|"p"|"t") => mkVerb leka (lek + "er") (lek + "te") (lek + "t") lek ;
+      _                 => mkVerb leka (lek + "er") (lek + "de") (lek + "t") lek
       } ;
 
   conjIII : Str -> Verb = \ske ->
-    mkVerb ske (ske + "r") (ske + "dde") (ske + "tt") ;
+    mkVerb ske (ske + "r") (ske + "dde") (ske + "tt") ske ;
 
   smartVerb : Str -> Verb = \w -> case w of {
     lek + "er" => conjII (lek+"a") ;
@@ -117,7 +116,7 @@ oper
     } ;
 
   irregVerb : (inf,past,sup : Str) -> Verb = \inf,past,sup ->
-    mkVerb inf (init inf + "er") past sup ;
+    mkVerb inf (init inf + "er") past sup (init inf) ;
 
 -- two-place verb with "case" as preposition; for transitive verbs, c=[]
 
@@ -125,6 +124,8 @@ oper
 
 ----- syntax --------------------------------
 
-  negation : Bool -> Str = \b -> case b of {True => [] ; False => "inte"} ; 
+  negation : Bool -> Str = \b -> case b of {True => [] ; False => "inte"} ;
+
+  copulaVerb : Verb = mkVerb "vara" "är" "var" "varit" "var" ;
 
 }
