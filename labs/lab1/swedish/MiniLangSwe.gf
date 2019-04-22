@@ -1,3 +1,3 @@
 --# -path=.:../abstract
 
-concrete MiniLangEng of MiniLang = MiniGrammarEng, MiniLexiconEng ;
+concrete MiniLangSwe of MiniLang = MiniGrammarSwe, MiniLexiconSwe ;

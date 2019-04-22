@@ -84,7 +84,7 @@ oper
 
   Verb : Type = {s : VForm => Str} ;
 
-  mkVerb : (inf,pres,past,sup,imp : Str) -> Verb
+  fullVerb : (inf,pres,past,sup,imp : Str) -> Verb
     = \inf,pres,past,sup,imp -> {
     s = table {
       Inf => inf ;
@@ -96,18 +96,18 @@ oper
     } ;
 
   conjI : Str -> Verb = \tala ->
-    mkVerb tala (tala + "r") (tala + "de") (tala + "t") tala ;
+    fullVerb tala (tala + "r") (tala + "de") (tala + "t") tala ;
     
   conjII : Str -> Verb = \leka ->
     let lek = init leka
     in
     case lek of {
-      _ + ("k"|"p"|"t") => mkVerb leka (lek + "er") (lek + "te") (lek + "t") lek ;
-      _                 => mkVerb leka (lek + "er") (lek + "de") (lek + "t") lek
+      _ + ("k"|"p"|"t") => fullVerb leka (lek + "er") (lek + "te") (lek + "t") lek ;
+      _                 => fullVerb leka (lek + "er") (lek + "de") (lek + "t") lek
       } ;
 
   conjIII : Str -> Verb = \ske ->
-    mkVerb ske (ske + "r") (ske + "dde") (ske + "tt") ske ;
+    fullVerb ske (ske + "r") (ske + "dde") (ske + "tt") ske ;
 
   smartVerb : Str -> Verb = \w -> case w of {
     lek + "er" => conjII (lek+"a") ;
@@ -116,7 +116,7 @@ oper
     } ;
 
   irregVerb : (inf,past,sup : Str) -> Verb = \inf,past,sup ->
-    mkVerb inf (init inf + "er") past sup (init inf) ;
+    fullVerb inf (init inf + "er") past sup (init inf) ;
 
 -- two-place verb with "case" as preposition; for transitive verbs, c=[]
 
@@ -126,6 +126,11 @@ oper
 
   negation : Bool -> Str = \b -> case b of {True => [] ; False => "inte"} ;
 
-  copulaVerb : Verb = mkVerb "vara" "är" "var" "varit" "var" ;
+  copulaVerb : Verb = fullVerb "vara" "är" "var" "varit" "var" ;
+
+  vpForm : Bool -> Verb -> {fin,inf : Str} = \isPres,verb -> case isPres of {
+    True  => {fin = verb.s ! Pres ; inf = []} ;
+    False => {fin = "har"         ; inf = verb.s ! Sup}
+    } ;
 
 }

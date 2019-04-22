@@ -1,3 +1,5 @@
+--# -path=.:../abstract
+
 resource MiniParadigmsSwe = open
 
   MiniGrammarSwe,
@@ -7,31 +9,43 @@ in {
 
 oper
   mkN = overload {
-    mkN : Str -> Noun   -- predictable noun, e.g. car-cars, boy-boys, fly-flies, bush-bushes
+    mkN : Str -> Noun   -- predictable noun, e.g. flicka-flickor, rike-riken
       = \n -> lin N (smartNoun n) ;
-    mkN : Str -> Str -> Noun  -- irregular noun, e.g. man-men
-      = \sg,pl -> lin N (mkNoun sg pl) ;
+    mkN : (sg,pl : Str) -> Noun  -- regular noun, when plural is known, e.g. bil-bilar, hus-hus
+      = \sg,pl -> lin N (dictNoun sg pl) ;
+    mkN : (sgi,sgd,pli,pld : Str) -> Gender -> Noun  -- full forms and gender
+      = \sgi,sgd,pli,pld,g -> lin N (fullNoun sgi sgd pli pld g) ;
     } ;
 
-  mkPN : Str -> PN
-    = \s -> lin PN {s = s} ;
+  mkPN = overload {
+    mkPN : Str -> PN
+      = \s -> lin PN {s = s ; g = Utr} ;
+    mkPN : Str -> Gender -> PN
+      = \s,g -> lin PN {s = s ; g = g} ;
+    } ;
 
-  mkA : Str -> A
-    = \s -> lin A {s = s} ;
-
+  mkA = overload {
+    mkA : Str -> A
+     = \s -> lin A (smartAdjective s) ;
+    mkA : (utr,neutr,pl : Str) -> A
+     = \utr,neutr,pl -> lin A (fullAdjective utr neutr pl) ;
+    } ;
+    
   mkV = overload {
-    mkV : (inf : Str) -> V  -- predictable verb, e.g. play-plays, cry-cries, wash-washes
+    mkV : Str -> V  -- predictable verb; better with present tense, e.g. hittar, leker
       = \s -> lin V (smartVerb s) ;
-    mkV : (inf,pres,part : Str) -> V  -- irregular verb, e.g. drink-drank-drunk
-      = \inf,pres,part -> lin V (irregVerb inf pres part) ;
+    mkV : (inf,past,sup : Str) -> V  -- irregular verb, e.g. dricka-drack-druckit
+      = \inf,past,sup -> lin V (irregVerb inf past sup) ;
+    mkV : (inf,pres,past,sup,imp : Str) -> Verb
+    = \inf,pres,past,sup,imp -> lin V (fullVerb inf pres past sup imp) ;
     } ;
 
   mkV2 = overload {
-    mkV2 : Str -> V2          -- predictable verb with direct object, e.g. "wash"
+    mkV2 : Str -> V2          -- predictable verb with direct object, e.g. "dräper"
       = \s   -> lin V2 (smartVerb s ** {c = []}) ;
-    mkV2 : Str  -> Str -> V2  -- predictable verb with preposition, e.g. "wait - for"
+    mkV2 : Str  -> Str -> V2  -- predictable verb with preposition, e.g. "titta - på"
       = \s,p -> lin V2 (smartVerb s ** {c = p}) ;
-    mkV2 : V -> V2            -- any verb with direct object, e.g. "drink"
+    mkV2 : V -> V2            -- any verb with direct object, e.g. dricka_V
       = \v   -> lin V2 (v ** {c = []}) ;
     mkV2 : V -> Str -> V2     -- any verb with preposition
       = \v,p -> lin V2 (v ** {c = p}) ;

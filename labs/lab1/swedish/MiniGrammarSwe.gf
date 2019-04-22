@@ -1,6 +1,6 @@
 --# -path=.:../abstract
-concrete MiniGrammarSwe of MiniGrammar = open MiniResSwe, Prelude in {
 
+concrete MiniGrammarSwe of MiniGrammar = open MiniResSwe, Prelude in {
 
   lincat
     Utt = {s : Str} ;
@@ -10,17 +10,20 @@ concrete MiniGrammarSwe of MiniGrammar = open MiniResSwe, Prelude in {
     S  = {s : Str} ;
     QS = {s : Str} ;
     Cl, QCl = {   -- word order is fixed in S and QS
-      subj  : Str ;                      -- subject
-      verb  : Bool => {fin,inf : Str} ;  -- dep. Temp, e.g. "har","sovit"
-      compl : Str           -- after verb: complement, adverbs, adjective
+      subj  : Str ;       -- subject
+      verb  : Verb ;
+      compl : Str         -- after verb: complement, adverbs, adjective
       } ;
     Imp = {s : Bool => Str} ;
-    VP = {verb : Verb ; compl : AForm => Str} ;
+    VP = {
+      verb : Verb ;
+      compl : AForm => Str
+      } ;
     AP = Adjective ;
     CN = Noun ;
     NP = {s : Case => Str ; a : AForm} ;
     Pron = {s : Case => Str ; a : AForm} ;
-    Det = {s : Gender => Str ; n : Number} ;
+    Det = {s : Gender => Str ; n : Number ; d : Species} ;
     Conj = {s : Str} ;
     Prep = {s : Str} ;
     V = Verb ;
@@ -38,7 +41,7 @@ concrete MiniGrammarSwe of MiniGrammar = open MiniResSwe, Prelude in {
     UttImpSg pol imp = {s = imp.s ! pol.isTrue} ;
 
     UseCl temp pol cl =
-      let clt = cl.verb ! temp.isPres
+      let clt = vpForm temp.isPres cl.verb
       in {
         s = pol.s ++ temp.s ++    --- needed for parsing: a hack
 	    cl.subj ++               -- hon
@@ -49,7 +52,7 @@ concrete MiniGrammarSwe of MiniGrammar = open MiniResSwe, Prelude in {
       } ;
       
     UseQCl temp pol cl =
-      let clt = cl.verb ! temp.isPres
+      let clt = vpForm temp.isPres cl.verb
       in {
         s = pol.s ++ temp.s ++
 	    clt.fin ++               -- har
@@ -60,29 +63,12 @@ concrete MiniGrammarSwe of MiniGrammar = open MiniResSwe, Prelude in {
       } ;
 
     QuestCl cl = cl ; -- since the parts are the same, we don't need to change anything
-{-
+
     PredVP np vp = {
-      subj = np.s ! Nom ;
-      compl = vp.compl ;
-      verb = \\plain,isPres => case <vp.verb.isAux, plain, isPres, np.a> of {
-
-        -- non-auxiliary verbs, negative/question present: "does (not) drink" 
-        <False,False,True,Agr Sg Per3> => {fin = "does" ; inf = vp.verb.s ! VF Inf} ;
-        <False,False,True,_          > => {fin = "do"   ; inf = vp.verb.s ! VF Inf} ;
-	
-        -- non-auxiliary, plain present ; auxiliary, all present: "drinks", "is (not)"
-        <_,_, True, Agr Sg Per1> => {fin = vp.verb.s ! PresSg1    ; inf = []} ;
-        <_,_, True, Agr Sg Per3> => {fin = vp.verb.s ! VF PresSg3 ; inf = []} ;
-        <_,_, True, _>           => {fin = vp.verb.s ! PresPl     ; inf = []} ;
-
-        -- all verbs, past: "has (not) drunk", "has (not) been"
-        <_,_, False,Agr Sg Per3> => {fin = "has"  ; inf = vp.verb.s ! VF PastPart} ;
-        <_,_, False,_          > => {fin = "have" ; inf = vp.verb.s ! VF PastPart} 
-
-        -- the negation word "not" is put in place in UseCl, UseQCl
-      }
-    } ;
--}
+      subj  = np.s ! Nom ;
+      compl = vp.compl ! np.a ;
+      verb  = vp.verb 
+      } ;
 
     ImpVP vp = {
       s = \\b => vp.verb.s ! Imper ++ negation b ++ vp.compl ! ASg Utr --- could be Pl
@@ -115,12 +101,12 @@ concrete MiniGrammarSwe of MiniGrammar = open MiniResSwe, Prelude in {
 
     AdvVP vp adv =
       vp ** {compl = \\a => vp.compl ! a ++ adv.s} ;
-{-      
+
     DetCN det cn = {
-      s = table {c => det.s ++ cn.s ! det.n} ;
-      a = Agr det.n Per3   -- this kind of NP is always third person
+      s = table {c => det.s ! cn.g ++ cn.s ! det.n ! det.d} ;
+      a = case det.n of {Sg => ASg cn.g ; Pl => APl} ;
       } ;
--}      
+      
     UsePN pn = {
       s = \\_ => pn.s ;
       a = ASg pn.g
@@ -133,18 +119,31 @@ concrete MiniGrammarSwe of MiniGrammar = open MiniResSwe, Prelude in {
       a = ASg cn.g
       } ;
 
-{-
-    a_Det = {s = pre {"a"|"e"|"i"|"o" => "an" ; _ => "a"} ; n = Sg} ; --- a/an can get wrong
-    aPl_Det = {s = "" ; n = Pl} ;
-    the_Det = {s = "the" ; n = Sg} ;
-    thePl_Det = {s = "the" ; n = Pl} ;
+    a_Det = {
+      s = table {Utr => "en" ; Neutr => "ett"} ;
+      n = Sg ;
+      d = Indef
+      } ;
+      
+    aPl_Det = {s = \\_ => [] ; n = Pl ; d = Indef} ;
+    
+    the_Det = {
+      s = table {Utr => "den" ; Neutr => "det"} ;
+      n = Sg ;
+      d = Def
+      } ;
+
+    thePl_Det = {s = \\_ => "de" ; n = Pl ; d = Def} ;
 
     UseN n = n ;
     
     AdjCN ap cn = {
-      s = table {n => ap.s ++ cn.s ! n}
+      s = \\n,d =>
+        ap.s ! (case d of {Def => APl ; _ => case n of {Pl => APl ; _ => ASg cn.g}}) ++
+        cn.s ! n ! d ;
+      g = cn.g ;
       } ;
--}
+      
     PositA a = a ;
 
     PrepNP prep np = {s = prep.s ++ np.s ! Acc} ;
@@ -160,7 +159,7 @@ concrete MiniGrammarSwe of MiniGrammar = open MiniResSwe, Prelude in {
     and_Conj = {s = "och"} ;
     or_Conj = {s = "eller"} ;
 
-    every_Det = {s = \\_ => "varje" ; n = Sg} ;
+    every_Det = {s = \\_ => "varje" ; n = Sg ; d = Indef} ;
 
     in_Prep = {s = "i"} ;
     on_Prep = {s = "på"} ;
@@ -195,5 +194,5 @@ concrete MiniGrammarSwe of MiniGrammar = open MiniResSwe, Prelude in {
       a = APl
       } ;
 
-    have_V2 = mkVerb "ha" "har" "hade" "haft" "ha" ** {c = []} ;
+    have_V2 = fullVerb "ha" "har" "hade" "haft" "ha" ** {c = []} ;
 }
