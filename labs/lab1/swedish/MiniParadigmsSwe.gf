@@ -36,14 +36,14 @@ oper
       = \s -> lin V (smartVerb s) ;
     mkV : (inf,past,sup : Str) -> V  -- irregular verb, e.g. dricka-drack-druckit
       = \inf,past,sup -> lin V (irregVerb inf past sup) ;
-    mkV : (inf,pres,past,sup,imp : Str) -> Verb
+    mkV : (inf,pres,past,sup,imp : Str) -> V
     = \inf,pres,past,sup,imp -> lin V (fullVerb inf pres past sup imp) ;
     } ;
 
   mkV2 = overload {
     mkV2 : Str -> V2          -- predictable verb with direct object, e.g. "dräper"
       = \s   -> lin V2 (smartVerb s ** {c = []}) ;
-    mkV2 : Str  -> Str -> V2  -- predictable verb with preposition, e.g. "titta - på"
+    mkV2 : Str -> Str -> V2  -- predictable verb with preposition, e.g. "titta - på"
       = \s,p -> lin V2 (smartVerb s ** {c = p}) ;
     mkV2 : V -> V2            -- any verb with direct object, e.g. dricka_V
       = \v   -> lin V2 (v ** {c = []}) ;

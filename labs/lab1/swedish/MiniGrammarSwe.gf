@@ -20,10 +20,10 @@ concrete MiniGrammarSwe of MiniGrammar = open MiniResSwe, Prelude in {
       compl : AForm => Str
       } ;
     AP = Adjective ;
-    CN = Noun ;
+    CN = Noun ** {isSimple : Bool} ;  --- isSimple = no adjectival modifier
     NP = {s : Case => Str ; a : AForm} ;
     Pron = {s : Case => Str ; a : AForm} ;
-    Det = {s : Gender => Str ; n : Number ; d : Species} ;
+    Det = {s : Bool => Gender => Str ; n : Number ; d : Species} ; --- Bool: ifSimple
     Conj = {s : Str} ;
     Prep = {s : Str} ;
     V = Verb ;
@@ -103,7 +103,7 @@ concrete MiniGrammarSwe of MiniGrammar = open MiniResSwe, Prelude in {
       vp ** {compl = \\a => vp.compl ! a ++ adv.s} ;
 
     DetCN det cn = {
-      s = table {c => det.s ! cn.g ++ cn.s ! det.n ! det.d} ;
+      s = table {c => det.s ! cn.isSimple ! cn.g ++ cn.s ! det.n ! det.d} ;
       a = case det.n of {Sg => ASg cn.g ; Pl => APl} ;
       } ;
       
@@ -120,28 +120,36 @@ concrete MiniGrammarSwe of MiniGrammar = open MiniResSwe, Prelude in {
       } ;
 
     a_Det = {
-      s = table {Utr => "en" ; Neutr => "ett"} ;
+      s = \\_ => table {Utr => "en" ; Neutr => "ett"} ;
       n = Sg ;
-      d = Indef
+      d = Indef ;
       } ;
       
-    aPl_Det = {s = \\_ => [] ; n = Pl ; d = Indef} ;
+    aPl_Det = {
+      s = \\_,_ => [] ;
+      n = Pl ;
+      d = Indef ;
+      } ;
     
     the_Det = {
-      s = table {Utr => "den" ; Neutr => "det"} ;
+      s = table {True => \\_ => [] ; _ => table {Utr => "den" ; Neutr => "det"}} ;
       n = Sg ;
-      d = Def
+      d = Def ;
       } ;
 
-    thePl_Det = {s = \\_ => "de" ; n = Pl ; d = Def} ;
+    thePl_Det = {
+      s = table {True => \\_ => [] ; _ => \\_ => "de"} ;
+      n = Pl ; d = Def ;
+      } ;
 
-    UseN n = n ;
+    UseN n = n ** {isSimple = True} ;
     
     AdjCN ap cn = {
       s = \\n,d =>
         ap.s ! (case d of {Def => APl ; _ => case n of {Pl => APl ; _ => ASg cn.g}}) ++
         cn.s ! n ! d ;
       g = cn.g ;
+      isSimple = False ;
       } ;
       
     PositA a = a ;
@@ -159,7 +167,7 @@ concrete MiniGrammarSwe of MiniGrammar = open MiniResSwe, Prelude in {
     and_Conj = {s = "och"} ;
     or_Conj = {s = "eller"} ;
 
-    every_Det = {s = \\_ => "varje" ; n = Sg ; d = Indef} ;
+    every_Det = {s = \\_,_ => "varje" ; n = Sg ; d = Indef} ;
 
     in_Prep = {s = "i"} ;
     on_Prep = {s = "på"} ;
