@@ -1,11 +1,7 @@
---# -path=.:../resource/abstract:../resource/english:../resource/api
-
--- model implementation using Mini RGL
-
 concrete DoctorEng of Doctor =
   open
-    MiniSyntaxEng,
-    MiniParadigmsEng,
+    SyntaxEng,
+    ParadigmsEng,
     Prelude
   in {
 
@@ -28,10 +24,8 @@ lin
   presNegPhrase fact = mkUtt (mkS negativePol fact) ;
   pastPosPhrase fact = mkUtt (mkS anteriorAnt fact) ;
   pastNegPhrase fact = mkUtt (mkS anteriorAnt negativePol fact) ;
-  -- presQuestionPhrase fact = mkUtt (mkQS (mkQCl fact)) ;
-  -- pastQuestionPhrase fact = mkUtt (mkQS anteriorAnt (mkQCl fact)) ;
-  presQuestionPhrase fact = let p : Utt = mkUtt (mkQS (mkQCl fact)) in p ** {s = p.s ++ SOFT_BIND ++ "?"} ;
-  pastQuestionPhrase fact = let p : Utt = mkUtt (mkQS anteriorAnt (mkQCl fact)) in p ** {s = p.s ++ SOFT_BIND ++ "?"} ;
+  presQuestionPhrase fact = mkUtt (mkQS (mkQCl fact)) ;
+  pastQuestionPhrase fact = mkUtt (mkQS anteriorAnt (mkQCl fact)) ;
 
 
   impPosPhrase action = mkUtt (mkImp action) ;
@@ -105,7 +99,7 @@ lin
   drugsSubstance = mkNP aPl_Det (mkN "drug") ;
 
 oper
-  pAdv : Str -> Adv = MiniParadigmsEng.mkAdv ;
+  pAdv : Str -> Adv = ParadigmsEng.mkAdv ;
 
   go_V = mkV "go" "went" "gone" ;
   stay_V = mkV "stay" ;

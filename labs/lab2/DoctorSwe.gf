@@ -27,11 +27,9 @@ lin
   presNegPhrase fact = mkUtt (mkS negativePol fact) ;
   pastPosPhrase fact = mkUtt (mkS anteriorAnt fact) ;
   pastNegPhrase fact = mkUtt (mkS anteriorAnt negativePol fact) ;
-  -- presQuestionPhrase fact = mkUtt (mkQS (mkQCl fact)) ;
-  -- pastQuestionPhrase fact = mkUtt (mkQS anteriorAnt (mkQCl fact)) ;
-  presQuestionPhrase fact = let p : Utt = mkUtt (mkQS (mkQCl fact)) in p ** {s = p.s ++ SOFT_BIND ++ "?"} ;
-  pastQuestionPhrase fact = let p : Utt = mkUtt (mkQS anteriorAnt (mkQCl fact)) in p ** {s = p.s ++ SOFT_BIND ++ "?"} ;
-
+  presQuestionPhrase fact = mkUtt (mkQS (mkQCl fact)) ;
+  pastQuestionPhrase fact = mkUtt (mkQS anteriorAnt (mkQCl fact)) ;
+ 
   impPosPhrase action = mkUtt (mkImp action) ;
   impNegPhrase action = mkUtt negativePol (mkImp action) ;
 
