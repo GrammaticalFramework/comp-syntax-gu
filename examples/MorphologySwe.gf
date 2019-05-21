@@ -26,8 +26,10 @@ oper
    declI : Str -> N = \apa ->
      fullN apa (apa+"n") (init apa +"or") (init apa+"orna") Utr ;
      
-   declII : Str -> N = \bil ->
-     fullN bil (bil+"en") (bil+"ar") (bil+"arna") Utr ;
+   declII : Str -> N = \bil -> case bil of {
+     pojk + "e" => fullN bil (pojk+"en") (pojk+"ar") (pojk+"arna") Utr ;
+     _          => fullN bil (bil+"en") (bil+"ar") (bil+"arna") Utr
+     } ;
      
    declIII : Str -> N = \tant ->
      fullN tant (tant+"en") (tant+"er") (tant+"erna") Utr ;
@@ -43,10 +45,7 @@ oper
 
    dictN : (sg,pl : Str) -> N = \sg,pl -> case pl of {
      _ + "or" => declI sg ;
-     _ + "ar" => case sg of {
-        _ + "e" => fullN sg (sg+"n") (init sg + "ar") (init sg +"arna") Utr ;
-        _ => declII sg
-	} ;
+     _ + "ar" => declII sg ;
      _ + "er" => fullN sg (sg+"en") pl (pl+"na") Utr ;
      _ + "en" => declIV sg ;
      _ => declV sg
