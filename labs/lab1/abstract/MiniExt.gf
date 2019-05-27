@@ -2,7 +2,10 @@ abstract MiniExt = MiniLang ** {
 
 -- implementing this on top of MiniLang(Eng|Swe) is an alternative assignment
 
+flags startcat = Utt ;
+
 cat
+  ClSlash ; -- slash clause,          e.g. "(that) I see"
   IP ;   -- interrogative pronoun,    e.g. "who"
   IAdv ; -- interrogative adverbial,  e.g. "where"
   RS ;   -- relative clause with fixed tense and polarity, e.g. "that I have not seen"
@@ -15,13 +18,15 @@ cat
   VA ;   -- AP-complement verb,       e.g. "become"
 
 fun
-  QuestVP   : IP -> VP -> QCl ;   -- who sees me
-  QuestV2   : IP -> V2 -> QCl ;   -- whom do I see
-  QuestIAdv : IAdv -> Cl -> QCl ; -- where does she see me
+  SlashV2    : V2 -> ClSlash ;     -- I see
+
+  QuestVP    : IP -> VP -> QCl ;      -- who sees me
+  QuestSlash : IP -> ClSlash -> QCl ; -- whom do I see
+  QuestIAdv  : IAdv -> Cl -> QCl ;    -- where does she see me
 
   UseRCl    : Temp -> Pol -> RCl -> RS ;
-  RelVP     : RP -> VP -> RCl ;  -- that sees me
-  RelV2     : RP -> V2 -> RCl ;  -- that I see
+  RelVP     : RP -> VP -> RCl ;       -- that sees me
+  RelSlash  : RP -> ClSlash -> RCl ;  -- that I see
   
   ComplVS   : VS -> S  -> VP ;  -- know that she sees me
   ComplVQ   : VS -> S  -> VP ;  -- wonder whom I see
