@@ -18,7 +18,7 @@ cat
   VA ;   -- AP-complement verb,       e.g. "become"
 
 fun
-  SlashV2    : V2 -> ClSlash ;     -- I see
+  SlashV2    : NP -> V2 -> ClSlash ;     -- I see
 
   QuestVP    : IP -> VP -> QCl ;      -- who sees me
   QuestSlash : IP -> ClSlash -> QCl ; -- whom do I see
